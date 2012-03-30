@@ -1,0 +1,5 @@
+name = "Wysiwyg TinyTypekit"
+description = "Injects Typekit fonts into TinyMCE"
+dependencies[] = wysiwyg
+package = "User interface"
+core = 6.x

@@ -1,0 +1,55 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Wysiwyg TinyTypekit module install file.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function wysiwyg_tinytypekit_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_tinytypekit_%'");
+}
+
+
+/**
+ * Implements hook_requirements().
+ */
+function wysiwyg_tinytypekit_requirements($phase) {
+  $requirements = array();
+
+  switch ($phase) {
+    case 'runtime':
+    // Default will be used - there is no such variable yet.
+    $path = variable_get('wysiwyg_tinytypekit_tinymce_tinytypekit_location', _wysiwyg_tinytypekit_default_path());
+    if (!file_exists($path)) {
+      $requirements['tinymce_tinytypekit'] = array(
+        'title' => t('TinyMCE TinyTypekit'),
+        'description' => t('In order for Wysiwyg TinyTypekit to work, the TinyMCE TinyTypekit plugin should be downloaded and put in %path directory', array('!settings' => l('settings', 'admin/settings/wysiwyg/codemagic'), '%path' => $path)),
+        'severity' => ($phase == 'install') ? REQUIREMENT_WARNING : REQUIREMENT_ERROR,
+        'value' => t('Third party !tinymce_tinytypekit software missing', array('!tinymce_tinytypekit' => l('TinyMCE TinyTypekit plugin', '#'))),
+      );
+    }
+    elseif (!file_exists("$path/editor_plugin.js")) {
+      $requirements['tinymce_tinytypekit'] = array(
+        'title' => t('TinyMCE TinyTypekit'),
+        'description' => t('The <code>%path</code> path exists but it appears that the directory structure underneath is incorrect. Please check that <code>%editor_plugin</code> and <code>%config</code> exist.',
+          array('%path' => $path,
+            '%editor_plugin' => "$path/editor_plugin.js",
+          )),
+        'severity' => $phase == 'install' ? REQUIREMENT_WARNING : REQUIREMENT_ERROR,
+        'value' => t('TinyMCE TinyTypekit plugin not properly installed'),
+      );
+    }
+    elseif ($phase == 'runtime') {
+      $requirements['tinymce_tinytypekit'] = array(
+        'title' => t('TinyMCE TinyTypekit'),
+        'severity' => REQUIREMENT_OK,
+        'value' => t('Installed correctly'),
+      );
+    }
+  }
+  return $requirements;
+}

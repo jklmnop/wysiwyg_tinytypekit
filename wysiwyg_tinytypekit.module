@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * wysiwyg_tinytypekit is a plugin for the TinyMCE Wysiwyg editor
+ */
+
+function _wysiwyg_tinytypekit_default_path() {
+  return function_exists('wysiwyg_get_path')
+      ? wysiwyg_get_path('tinymce') . '/jscripts/tiny_mce/plugins/tinytypekit'
+      : 'sites/all/libraries/tinymce/jscripts/tiny_mce/plugins/tinytypekit';
+}
+
+/**
+ * Implements hook_help().
+ */
+function wysiwyg_tinytypekit_help($path, $arg) {
+  if ($path == 'admin/modules#description') {
+    return t('Enables the TinyMCE TinyTypekit plugin');
+  }
+}
+
+/**
+ * Implements hook_wysiwyg_plugin().
+ */
+
+function wysiwyg_tinytypekit_wysiwyg_plugin($editor) {
+  switch ($editor) {
+    case 'tinymce':
+      $path = variable_get('wysiwyg_tinytypekit_tinymce_tinytypekit_location', _wysiwyg_tinytypekit_default_path());
+      if (file_exists("$path/editor_plugin.js")) {
+        return array(
+          'tinytypekit' => array(
+            'path' => $path,
+            'filename' => 'editor_plugin.js',
+            'buttons' => array('tinytypekit' => t('TinyTypekit')),
+            'url' => '',
+            'internal' => FALSE, 
+	    'load' => TRUE,
+          ),
+        );
+      }
+  }
+}
